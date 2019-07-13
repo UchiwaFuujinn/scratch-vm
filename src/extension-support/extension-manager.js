@@ -20,10 +20,11 @@ const builtinExtensions = {
     text2speech: () => require('../extensions/scratch3_text2speech'),
     translate: () => require('../extensions/scratch3_translate'),
     videoSensing: () => require('../extensions/scratch3_video_sensing'),
+    speech2text: () => require('../extensions/scratch3_speech2text'),
     ev3: () => require('../extensions/scratch3_ev3'),
     makeymakey: () => require('../extensions/scratch3_makeymakey'),
-    boost: () => require('../extensions/scratch3_boost'),
-    gdxfor: () => require('../extensions/scratch3_gdx_for')
+    gdxfor: () => require('../extensions/scratch3_gdx_for'),
+    webmidi: () => require('../extensions/scratch3_webmidi')
 };
 
 /**
@@ -294,7 +295,7 @@ class ExtensionManager {
             }
             return results;
         }, []);
-        extensionInfo.menus = extensionInfo.menus || {};
+        extensionInfo.menus = extensionInfo.menus || [];
         extensionInfo.menus = this._prepareMenuInfo(serviceName, extensionInfo.menus);
         return extensionInfo;
     }
@@ -309,24 +310,15 @@ class ExtensionManager {
     _prepareMenuInfo (serviceName, menus) {
         const menuNames = Object.getOwnPropertyNames(menus);
         for (let i = 0; i < menuNames.length; i++) {
-            const menuName = menuNames[i];
-            let menuInfo = menus[menuName];
-
-            // If the menu description is in short form (items only) then normalize it to general form: an object with
-            // its items listed in an `items` property.
-            if (!menuInfo.items) {
-                menuInfo = {
-                    items: menuInfo
-                };
-                menus[menuName] = menuInfo;
-            }
-            // If `items` is a string, it should be the name of a function in the extension object. Calling the
-            // function should return an array of items to populate the menu when it is opened.
-            if (typeof menuInfo.items === 'string') {
-                const menuItemFunctionName = menuInfo.items;
+            const item = menuNames[i];
+            // If the value is a string, it should be the name of a function in the
+            // extension object to call to populate the menu whenever it is opened.
+            // Set up the binding for the function object here so
+            // we can use it later when converting the menu for Scratch Blocks.
+            if (typeof menus[item] === 'string') {
                 const serviceObject = dispatch.services[serviceName];
-                // Bind the function here so we can pass a simple item generation function to Scratch Blocks later.
-                menuInfo.items = this._getExtensionMenuItems.bind(this, serviceObject, menuItemFunctionName);
+                const menuName = menus[item];
+                menus[item] = this._getExtensionMenuItems.bind(this, serviceObject, menuName);
             }
         }
         return menus;
@@ -335,11 +327,11 @@ class ExtensionManager {
     /**
      * Fetch the items for a particular extension menu, providing the target ID for context.
      * @param {object} extensionObject - the extension object providing the menu.
-     * @param {string} menuItemFunctionName - the name of the menu function to call.
+     * @param {string} menuName - the name of the menu function to call.
      * @returns {Array} menu items ready for scratch-blocks.
      * @private
      */
-    _getExtensionMenuItems (extensionObject, menuItemFunctionName) {
+    _getExtensionMenuItems (extensionObject, menuName) {
         // Fetch the items appropriate for the target currently being edited. This assumes that menus only
         // collect items when opened by the user while editing a particular target.
         const editingTarget = this.runtime.getEditingTarget() || this.runtime.getTargetForStage();
@@ -347,7 +339,7 @@ class ExtensionManager {
         const extensionMessageContext = this.runtime.makeMessageContextForTarget(editingTarget);
 
         // TODO: Fix this to use dispatch.call when extensions are running in workers.
-        const menuFunc = extensionObject[menuItemFunctionName];
+        const menuFunc = extensionObject[menuName];
         const menuItems = menuFunc.call(extensionObject, editingTargetID).map(
             item => {
                 item = maybeFormatMessage(item, extensionMessageContext);
@@ -365,7 +357,7 @@ class ExtensionManager {
             });
 
         if (!menuItems || menuItems.length < 1) {
-            throw new Error(`Extension menu returned no items: ${menuItemFunctionName}`);
+            throw new Error(`Extension menu returned no items: ${menuName}`);
         }
         return menuItems;
     }
@@ -384,53 +376,29 @@ class ExtensionManager {
             blockAllThreads: false,
             arguments: {}
         }, blockInfo);
-        blockInfo.opcode = blockInfo.opcode && this._sanitizeID(blockInfo.opcode);
+        blockInfo.opcode = this._sanitizeID(blockInfo.opcode);
         blockInfo.text = blockInfo.text || blockInfo.opcode;
 
-        switch (blockInfo.blockType) {
-        case BlockType.EVENT:
-            if (blockInfo.func) {
-                log.warn(`Ignoring function "${blockInfo.func}" for event block ${blockInfo.opcode}`);
-            }
-            break;
-        case BlockType.BUTTON:
-            if (blockInfo.opcode) {
-                log.warn(`Ignoring opcode "${blockInfo.opcode}" for button with text: ${blockInfo.text}`);
-            }
-            break;
-        default: {
-            if (!blockInfo.opcode) {
-                throw new Error('Missing opcode for block');
-            }
+        if (blockInfo.blockType !== BlockType.EVENT) {
+            blockInfo.func = blockInfo.func ? this._sanitizeID(blockInfo.func) : blockInfo.opcode;
 
-            const funcName = blockInfo.func ? this._sanitizeID(blockInfo.func) : blockInfo.opcode;
-
-            const getBlockInfo = blockInfo.isDynamic ?
-                args => args && args.mutation && args.mutation.blockInfo :
-                () => blockInfo;
-            const callBlockFunc = (() => {
-                if (dispatch._isRemoteService(serviceName)) {
-                    return (args, util, realBlockInfo) =>
-                        dispatch.call(serviceName, funcName, args, util, realBlockInfo);
-                }
-
-                // avoid promise latency if we can call direct
+            /**
+             * This is only here because the VM performs poorly when blocks return promises.
+             * @TODO make it possible for the VM to resolve a promise and continue during the same Scratch "tick"
+             */
+            if (dispatch._isRemoteService(serviceName)) {
+                blockInfo.func = dispatch.call.bind(dispatch, serviceName, blockInfo.func);
+            } else {
                 const serviceObject = dispatch.services[serviceName];
-                if (!serviceObject[funcName]) {
-                    // The function might show up later as a dynamic property of the service object
-                    log.warn(`Could not find extension block function called ${funcName}`);
+                const func = serviceObject[blockInfo.func];
+                if (func) {
+                    blockInfo.func = func.bind(serviceObject);
+                } else if (blockInfo.blockType !== BlockType.EVENT) {
+                    throw new Error(`Could not find extension block function called ${blockInfo.func}`);
                 }
-                return (args, util, realBlockInfo) =>
-                    serviceObject[funcName](args, util, realBlockInfo);
-            })();
-
-            blockInfo.func = (args, util) => {
-                const realBlockInfo = getBlockInfo(args);
-                // TODO: filter args using the keys of realBlockInfo.arguments? maybe only if sandboxed?
-                return callBlockFunc(args, util, realBlockInfo);
-            };
-            break;
-        }
+            }
+        } else if (blockInfo.func) {
+            log.warn(`Ignoring function "${blockInfo.func}" for event block ${blockInfo.opcode}`);
         }
 
         return blockInfo;
