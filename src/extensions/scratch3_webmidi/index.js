@@ -348,16 +348,43 @@ class Scratch3WebMIDI {
 					}
 				},
 
-
 				{
 					opcode: 's_Noteon_out',
 					text: formatMessage({
 						id: 'webmidi.noteon_out',
-						default: 'NOTE ON [notenum][velo]',
+						default: 'NOTE ON [channelnum][notenum][velo]',
 						description: 'send note on'
 					}),
 					blockType: BlockType.COMMAND,
 					arguments: {
+						channelnum: {
+							type: ArgumentType.NUMBER,
+							defaultValue: 1
+						},
+						notenum: {
+							type: ArgumentType.NUMBER,
+							defaultValue: 60
+						},
+						velo: {
+							type: ArgumentType.NUMBER,
+							defaultValue: 127
+						}
+					}
+				},
+
+				{
+					opcode: 's_Noteoff_out',
+					text: formatMessage({
+						id: 'webmidi.noteon_out',
+						default: 'NOTE OFF [channelnum][notenum][velo]',
+						description: 'send note on'
+					}),
+					blockType: BlockType.COMMAND,
+					arguments: {
+						channelnum: {
+							type: ArgumentType.NUMBER,
+							defaultValue: 1
+						},
 						notenum: {
 							type: ArgumentType.NUMBER,
 							defaultValue: 60
@@ -609,12 +636,19 @@ class Scratch3WebMIDI {
 			break;
 		}
 		return n_flag;
-	};
+	}
 
 /* -------------------------------------------------------------------------	*/
-//MIDI OUT
+//NOTE ON
 	s_Noteon_out(args){
-		return m_midiout(0x90,args.notenum&0x7F,args.velo&0x7F);
+		var chnum = (args.channelnum&0x0F)-1;
+		return m_midiout(0x90+chnum,args.notenum&0x7F,args.velo&0x7F);
+	}
+
+//NOTE OFF
+	s_Noteoff_out(args){
+		var chnum = (args.channelnum&0x0F)-1;
+		return m_midiout(0x80+chnum,args.notenum&0x7F,args.velo&0x7F);
 	}
 }
 
