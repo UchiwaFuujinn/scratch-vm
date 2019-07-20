@@ -375,9 +375,9 @@ class Scratch3WebMIDI {
 				{
 					opcode: 's_Noteoff_out',
 					text: formatMessage({
-						id: 'webmidi.noteon_out',
+						id: 'webmidi.noteoff_out',
 						default: 'NOTE OFF [channelnum][notenum][velo]',
-						description: 'send note on'
+						description: 'send note off'
 					}),
 					blockType: BlockType.COMMAND,
 					arguments: {
