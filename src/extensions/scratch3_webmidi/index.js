@@ -1,4 +1,4 @@
-const ArgumentType = require('../../extension-support/argument-type');
+﻿const ArgumentType = require('../../extension-support/argument-type');
 const BlockType = require('../../extension-support/block-type');
 const Cast = require('../../util/cast');
 const log = require('../../util/log');
@@ -44,6 +44,17 @@ const menuIconURI = 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHdpZHRoP
 	var mNoteBuf = 0;
 	var mPBend	 = 64;
 	var mPCn	 = 0;
+
+/* -------------------------------------------------------------------------	*/
+	var mCount = 0;
+	var mBeat = 0;
+	const mBaseCount=20;
+	var mTimer = setInterval(function(){
+//		clearInterval(id);　//idをclearIntervalで指定している
+		mCount++;
+		mBeat++;
+		if(mCount>=1000){ mCount=0; mBeat=0; }
+	} , mBaseCount);
 
 /**
  * Enum for eventl ist parameter values.
@@ -320,7 +331,7 @@ class Scratch3WebMIDI {
 					text: formatMessage({
 						id: 'webmidi.s_Getkeyonnum',
 						default: 'KEY ON [ckeynum]',
-						description: 'Control Change Value'
+						description: 'Note Number'
 					}),
 					blockType: BlockType.HAT,
 					arguments: {
@@ -392,6 +403,22 @@ class Scratch3WebMIDI {
 						velo: {
 							type: ArgumentType.NUMBER,
 							defaultValue: 127
+						}
+					}
+				},
+
+				{
+					opcode: 's_GetBeat',
+					text: formatMessage({
+						id: 'webmidi.s_GetBeat',
+						default: 'BEAT [tempo]',
+						description: 'Tempo'
+					}),
+					blockType: BlockType.HAT,
+					arguments: {
+						tempo: {
+							type: ArgumentType.NUMBER,
+							defaultValue: 120
 						}
 					}
 				},
@@ -481,7 +508,7 @@ class Scratch3WebMIDI {
 	s_Getmidievent() {
 		// Reset alarm_went_off if it is true, and return true
 		// otherwise, return false.
-		if (mMIDI_event === true) {
+		if (mMIDI_event == true) {
 			mMIDI_event = false;
 			return true;
        }
@@ -650,6 +677,30 @@ class Scratch3WebMIDI {
 		var chnum = (args.channelnum&0x0F)-1;
 		return m_midiout(0x80+chnum,args.notenum&0x7F,args.velo&0x7F);
 	}
-}
 
+
+/* -------------------------------------------------------------------------	*/
+/*var mCount = 0;
+var mTimer = setInterval(function(){
+//		clearInterval(id);　//idをclearIntervalで指定している
+		mCount++;
+	}
+	}, 20);
+*/
+
+// Beat
+	s_GetBeat(args) {
+		// Reset alarm_went_off if it is true, and return true
+		// otherwise, return false.
+		var iduration = 60000/args.tempo/mBaseCount;
+
+		if (mBeat >= iduration) {
+			mBeat = 0;
+			return true;
+       }
+       return false;
+	}
+
+/* -------------------------------------------------------------------------	*/
+}
 module.exports = Scratch3WebMIDI;
