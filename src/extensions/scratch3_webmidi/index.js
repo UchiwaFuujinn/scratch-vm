@@ -46,14 +46,19 @@ const menuIconURI = 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHdpZHRoP
 	var mPCn	 = 0;
 
 /* -------------------------------------------------------------------------	*/
-	var mCount = 0;
-	var mBeat = 0;
-	const mBaseCount=20;
+	var mCount	= 0;
+	var mBeat	= 0;
+	var mDticks = 1;
+	var mTempo	=120;
+	const mBaseCount=4;
+	const mResolution = 480;
+
 	var mTimer = setInterval(function(){
 //		clearInterval(id);　//idをclearIntervalで指定している
-		mCount++;
-		mBeat++;
-		if(mCount>=1000){ mCount=0; mBeat=0; }
+		mDticks = mTempo*mResolution/60000;
+		mCount=mCount+mDticks*mBaseCount;
+		mBeat=mBeat+mDticks*mBaseCount;
+		if(mCount>mResolution*4){ mCount = mCount - mResolution*4; }
 	} , mBaseCount);
 
 /**
@@ -113,7 +118,7 @@ function failure(error)
 	}
 
 function m_midiin(event){		/* MIDI parse */
-	console.log(event.data[0]);
+//	console.log(event.data[0]);
 	switch(event.data[0]&0xF0){
 		case 0x80:
 			mMIDI_event=true;
@@ -275,6 +280,12 @@ class Scratch3WebMIDI {
 				},
 
 				{
+					opcode: 's_Ticks',
+					text: 'Ticks',
+					blockType: BlockType.REPORTER
+				},
+
+				{
 					opcode: 's_Ccin',
 					text: formatMessage({
 						id: 'webmidi.s_Ccin',
@@ -404,6 +415,22 @@ class Scratch3WebMIDI {
 							type: ArgumentType.NUMBER,
 							defaultValue: 127
 						}
+					}
+				},
+
+				{
+					opcode: 's_RestTicks',
+					text: formatMessage({
+						id: 'webmidi.rest_tickes',
+						default: 'Rest [rticks] tickes',
+						description: 'rest some tickes'
+					}),
+					blockType: BlockType.COMMAND,
+					arguments: {
+						rticks: {
+							type: ArgumentType.NUMBER,
+							defaultValue: 240
+						},
 					}
 				},
 
@@ -692,13 +719,36 @@ var mTimer = setInterval(function(){
 	s_GetBeat(args) {
 		// Reset alarm_went_off if it is true, and return true
 		// otherwise, return false.
-		var iduration = 60000/args.tempo/mBaseCount;
+		mTempo = args.tempo;
 
-		if (mBeat >= iduration) {
-			mBeat = 0;
+		if (mBeat >= mResolution) {
+			mBeat = mBeat-mResolution;
 			return true;
        }
        return false;
+	}
+
+	s_Ticks(){
+		return (Math.floor(mCount));
+	}
+
+	s_RestTicks(args){
+		args.rticks = args.rticks%480;
+		var irticks = args.rticks;
+		var iCount = mCount;
+
+		var itimer = setInterval(function(){
+			var dcount = mCount-iCount;
+			if ( dcount<0 ) dcount =dcount + mResolution*4;
+			if( dcount >= irticks){
+//				console.log(irticks,dcount);
+				clearInterval(itimer);
+				return true;
+			}
+	       return false;
+
+		} , mBaseCount);
+
 	}
 
 /* -------------------------------------------------------------------------	*/
