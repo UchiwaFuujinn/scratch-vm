@@ -3,7 +3,7 @@ const BlockType = require('../../extension-support/block-type');
 const Cast = require('../../util/cast');
 const log = require('../../util/log');
 const formatMessage = require('format-message');
-const MathUtil = require('../../util/math-util');
+
 const Timer = require('../../util/timer');
 
 /**
@@ -19,49 +19,6 @@ const blockIconURI = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYA
  */
 // eslint-disable-next-line max-len
 const menuIconURI = 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDQwIDQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48ZyBpZD0iSUQwLjA4NjgyNDQzOTAwMDMzODMyIiB0cmFuc2Zvcm09Im1hdHJpeCgwLjQ5MTU0NjY2MDY2MTY5NzQsIDAsIDAsIDAuNDkxNTQ2NjYwNjYxNjk3NCwgLTY0LjUsIC03Ny4yNSkiPjxwYXRoIGlkPSJJRDAuNTcyMTQ2MjMwMzc3MjU2OSIgZmlsbD0iI0ZGOTQwMCIgc3Ryb2tlPSJub25lIiBkPSJNIDE4OCAxNDEgTCAyNTAgMTQxIEwgMjUwIDIwMyBMIDE4OCAyMDMgTCAxODggMTQxIFogIiB0cmFuc2Zvcm09Im1hdHJpeCgxLjI4NzkwMzMwODg2ODQwODIsIDAsIDAsIDEuMjg3OTAzMzA4ODY4NDA4MiwgLTExMC45LCAtMjQuNCkiLz48cGF0aCBpZD0iSUQwLjYzODMzNjEzNTA3NDQ5NjMiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0ZGRkZGRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGQ9Ik0gMTk2IDIwNCBDIDE5NiAyMDQgMTkyLjcwNiAxOTAuMDU4IDE5MyAxODMgQyAxOTMuMDc0IDE4MS4yMzYgMTk1Ljg4NiAxNzguNDU4IDE5NyAxODAgQyAyMDEuNDU1IDE4Ni4xNjggMjAzLjQ0MyAyMDMuNzU0IDIwNiAyMDEgQyAyMDkuMjExIDE5Ny41NDIgMjEwIDE2NiAyMTAgMTY2ICIgdHJhbnNmb3JtPSJtYXRyaXgoMSwgMCwgMCwgMSwgLTU3LCAxNS44KSIvPjxwYXRoIGlkPSJJRDAuNzU4NzMwMzU2NTgxNTA5MSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRkZGRkZGIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZD0iTSAyMTUgMTY5IEMgMjE1IDE2OSAyMTguMzY3IDE2OS41MzQgMjIwIDE3MCBDIDIyMC43MTYgMTcwLjIwNSAyMjEuMjc4IDE3MC44MTkgMjIyIDE3MSBDIDIyMi42NDYgMTcxLjE2MiAyMjMuMzY4IDE3MC43ODkgMjI0IDE3MSBDIDIyNC40NDcgMTcxLjE0OSAyMjUgMTcyIDIyNSAxNzIgIiB0cmFuc2Zvcm09Im1hdHJpeCgxLCAwLCAwLCAxLCAtNTcsIDE1LjgpIi8+PHBhdGggaWQ9IklEMC4yNDM2NzMwNzMxMjc4NjU4IiBmaWxsPSJub25lIiBzdHJva2U9IiNGRkZGRkYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBkPSJNIDIyNyAxNTQgQyAyMjcgMTU0IDIxOC41NTUgMTQ3Ljg5MCAyMTcgMTUxIEMgMjEyLjM0NSAxNjAuMzEwIDIxMS4yODkgMTcxLjczMyAyMTMgMTgyIEMgMjEzLjYxMiAxODUuNjcyIDIyMyAxODcgMjIzIDE4NyAiIHRyYW5zZm9ybT0ibWF0cml4KDEsIDAsIDAsIDEsIC01NywgMTUuOCkiLz48cGF0aCBpZD0iSUQwLjc5MzkzOTQ4MTk1NTAyMTYiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0ZGRkZGRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGQ9Ik0gMTc1IDIwMC41MDAgQyAxNzUgMjAwLjUwMCAxNjkuODA1IDIyMS45MTMgMTcxIDIyMi43NTAgQyAxNzIuMTk1IDIyMy41ODcgMTc4Ljc5NSAyMDUuMjk1IDE4Mi41MDAgMjA1Ljc1MCBDIDE4NS45MjAgMjA2LjE3MCAxODEuODU5IDIyNC41MDAgMTg1LjI1MCAyMjQuNTAwIEMgMTg5LjIxMyAyMjQuNTAwIDE5Ny4yNTAgMjA1Ljc1MCAxOTcuMjUwIDIwNS43NTAgIi8+PC9nPjwvc3ZnPg==';
-
-	/* for MIDI Ebvent */
-	var mMIDI= null;
-	var mInputs	=null;
-	var mOutputs=null;
-
-	var mCtlbuf = new Array(0x80);
-	var mNoteOn = new Array(0x80);
-
-	var mCC_change_event=false
-	var mMIDI_event		= false;
-	var mKey_on_event	= false;
-	var mKey_off_event	= false;
-	var mPBend_event	= false;
-	var mPC_event		= false;
-
-	var mCC_change_flag	= false;
-	var mKey_on_flag 	= false;
-	var mKey_off_flag 	= false;
-	var mPC_flag		= false;
-	var mPBend_flag		= false;
-
-	var mNoteNum = 0;
-	var mNoteVel = 0;
-	var mNoteBuf = 0;
-	var mPBend	 = 64;
-	var mPCn	 = 0;
-
-/* -------------------------------------------------------------------------	*/
-	var mCount	= 0;
-	var mBeat	= 0;
-	var mDticks = 1;
-	var mTempo	=120;
-	const mBaseCount=4;
-	const mResolution = 480;
-
-	var mTimer = setInterval(function(){
-//		clearInterval(id);　//idをclearIntervalで指定している
-		mDticks = mTempo*mResolution/60000;
-		mCount=mCount+mDticks*mBaseCount;
-		mBeat=mBeat+mDticks*mBaseCount;
-		if(mCount>mResolution*4){ mCount = mCount - mResolution*4; }
-	} , mBaseCount);
 
 /**
  * Enum for eventl ist parameter values.
@@ -84,108 +41,17 @@ const EventList = {
 	PG_CHG:	'pg-chg'
 };
 
-function success(midiAccess)
-	{
-		mMIDI=midiAccess;
-
-		for(var i=0; i<0x80; i++){
-			mCtlbuf[i]=0;
-			mNoteOn[i]=0;
-		}
-
-		if (typeof mMIDI.inputs === "function") {
-			mInputs  =	mMIDI.inputs();
-			mOutputs =	mMIDI.outputs();
-		} else {
-			var inputIterator = mMIDI.inputs.values();
-			mInputs = [];
-			for (var o = inputIterator.next(); !o.done; o = inputIterator.next()) {
-				mInputs.push(o.value)
-			}
-			var outputIterator = mMIDI.outputs.values();
-			mOutputs = [];
-			for (var o = outputIterator.next(); !o.done; o = outputIterator.next()) {
-				mOutputs.push(o.value)
-			}
-		}
-		for(var i=0; i<mInputs.length;i++){
-			mInputs[i].onmidimessage=m_midiin;
-		}
-		alert( "Success MIDI!" );
-	}
-
-function failure(error)
-	{
-		alert( "Failed MIDI!" + error );
-	}
-
-function m_midiin(event){		/* MIDI parse */
-//	console.log(event.data[0]);
-	switch(event.data[0]&0xF0){
-		case 0x80:
-			mMIDI_event=true;
-			m_noteon(event.data[1],0);
-			break;
-		case 0x90:
-			mMIDI_event=true;
-			m_noteon(event.data[1],event.data[2]);
-			break;
-		case 0xA0:
-			break;
-		case 0xB0:
-			mMIDI_event=true;
-			mCC_change_event=true;
-			mCC_change_flag=true;
-			mCtlbuf[event.data[1]]=event.data[2];
-			break;
-		case 0xC0:
-			mMIDI_event=true;
-			mPC_event=true;
-			mPC_flag=true;
-			mPCn=event.data[1];
-			break;
-		case 0xD0:
-			break;
-		case 0xE0:
-			mMIDI_event=true;
-			mPBend_event=true;
-			mPBend_flag=true;
-			mPBend=event.data[2];
-			break;
-		case 0xF0:
-			break;
-	}
-}
-
-function m_noteon(note, vel)
+function rest_time_wait(irticks)
 {
-	mNoteNum=note;
-	mNoteVel=vel;
-
-	if(vel>0){
-		mKey_on_event	= true;
-		mKey_on_flag	= true;
-		mNoteOn[mNoteNum]= true;
-	} else {
-		mKey_off_event	= true;
-		mKey_off_flag	= true;
-	}
-}
-
-
-function m_midiout(event, note, vel){
-	var data1=event&0xFF;
-	var data2=note&0x7F;
-	var data3=vel&0x7F;
-
-	if(mOutputs!=null){
-		for(var i=0; i<mOutputs.length; i++){
-			var l_output=mOutputs[i];
-			if(l_output!=null){
-				l_output.send([data1,data2,data3], 0);
-			}
+	var iCount = mCount;
+	var itimer = setInterval(function(){
+		var dcount = mCount-iCount;
+		if ( dcount<0 ) dcount =dcount + mResolution*4;
+		if( dcount >= irticks){
+			clearInterval(itimer);
+			s_RestTicks();
 		}
-	}
+	} , mBaseCount);
 }
 
 /**
@@ -202,34 +68,82 @@ class Scratch3WebMIDI {
          */
         this.runtime = runtime;
 
-		navigator.requestMIDIAccess().then( success, failure );
+		/* for MIDI Ebvent */
+		this.mMIDI	= null;
+		this.mInputs =null;
+		this.mOutputs=null;
 
-        //this._onTargetCreated = this._onTargetCreated.bind(this);
-        //this.runtime.on('targetWasCreated', this._onTargetCreated);
+		this.mCtlbuf = new Array(0x80);
+		this.mNoteOn = new Array(0x80);
+
+		this.mCC_change_event=false
+		this.mMIDI_event	= false;
+		this.mKey_on_event	= false;
+		this.mKey_off_event	= false;
+		this.mPBend_event	= false;
+		this.mPC_event		= false;
+
+		this.mCC_change_flag= false;
+		this.mKey_on_flag 	= false;
+		this.mKey_off_flag 	= false;
+		this.mPC_flag		= false;
+		this.mPBend_flag	= false;
+
+		this.mNoteNum	= 0;
+		this.mNoteVel	= 0;
+		this.mNoteBuf	= 0;
+		this.mPBend		= 64;
+		this.mPCn		= 0;
+
+/* -------------------------------------------------------------------------	*/
+		this.mCount		= 0;
+		this.mBeat		= 0;
+		this.mDticks	= 1;
+		this.mTempo		= 120;
+
+		this.mBaseCount		=4;
+		this.mResolution	= 480;
+
+/* -------------------------------------------------------------------------	*/
+		navigator.requestMIDIAccess().then( this._success, this._failure );
+
+/* -------------------------------------------------------------------------	*/
+		this.mTimer = setInterval(function(){
+			this.mDticks= this.mTempo*this.mResolution/60000;
+			this.mCount	= this.mCount+this.mDticks*this.mBaseCount;
+			this.mBeat	= this.mBeat+this.mDticks*this.mBaseCount;
+			if(this.mCount>this.mResolution*4){
+				this.mCount = this.mCount - this.mResolution*4;
+			}
+		} , this.mBaseCount);
     }
 
-	success(midiAccess)
+	_success(midiAccess)
 	{
-		this.m=midiAccess;
+		this.mMIDI=midiAccess;
 
-		if (typeof this.m.inputs === "function") {
-			this.mInputs  =	this.m.inputs();
-			this.mOutputs =	this.m.outputs();
+		for(var i=0; i<0x80; i++){
+			this.mCtlbuf[i]=0;
+			this.mNoteOn[i]=0;
+		}
+
+		if (typeof this.mMIDI.inputs === "function") {
+			this.mInputs  =	this.mMIDI.inputs();
+			this.mOutputs =	this.mMIDI.outputs();
 		} else {
-			var inputIterator = this.m.inputs.values();
+			var inputIterator = this.mMIDI.inputs.values();
 			this.mInputs = [];
 			for (var o = inputIterator.next(); !o.done; o = inputIterator.next()) {
 				this.mInputs.push(o.value)
 			}
-
-			var outputIterator = this.m.outputs.values();
+			var outputIterator = this.mMIDI.outputs.values();
 			this.mOutputs = [];
 			for (var o = outputIterator.next(); !o.done; o = outputIterator.next()) {
 				this.mOutputs.push(o.value)
 			}
 		}
 		for(var i=0; i<mInputs.length;i++){
-			this.mInputs[i].onmidimessage=this.m_midiin;
+			this.mInputs[i].onmidimessage=this._m_midiin;
 		}
 		alert( "Success MIDI!" );
 	}
@@ -239,6 +153,77 @@ class Scratch3WebMIDI {
 		alert( "Failed MIDI!" + error );
 	}
 
+	/* MIDI parse */
+	_m_midiin(event){
+		switch(event.data[0]&0xF0){
+			case 0x80:
+				this.mMIDI_event=true;
+				this._m_noteon(event.data[1],0);
+				break;
+			case 0x90:
+				this.mMIDI_event=true;
+				this._m_noteon(event.data[1],event.data[2]);
+				break;
+			case 0xA0:
+				break;
+			case 0xB0:
+				this.mMIDI_event=true;
+				this.mCC_change_event=true;
+				this.mCC_change_flag=true;
+				this.mCtlbuf[event.data[1]]=event.data[2];
+				break;
+			case 0xC0:
+				this.mMIDI_event=true;
+				this.mPC_event=true;
+				this.mPC_flag=true;
+				this.mPCn=event.data[1];
+				break;
+			case 0xD0:
+				break;
+			case 0xE0:
+				this.mMIDI_event=true;
+				this.mPBend_event=true;
+				this.mPBend_flag=true;
+				this.mPBend=event.data[2];
+				break;
+			case 0xF0:
+				break;
+		}
+	}
+
+	_m_noteon(note, vel)
+	{
+		this.mNoteNum=note;
+		this.mNoteVel=vel;
+
+		if(vel>0){
+			this.mKey_on_event	= true;
+			this.mKey_on_flag	= true;
+			this.mNoteOn[mNoteNum]= true;
+		} else {
+			this.mKey_off_event	= true;
+			this.mKey_off_flag	= true;
+		}
+	}
+
+
+	_m_midiout(event, note, vel)
+	{
+		var data1=event&0xFF;
+		var data2=note&0x7F;
+		var data3=vel&0x7F;
+
+		if(this.mOutputs!=null){
+			for(var i=0; i<this.mOutputs.length; i++){
+				var l_output=this.mOutputs[i];
+				if(l_output!=null){
+					l_output.send([data1,data2,data3], 0);
+				}
+			}
+		}
+	}
+
+/* -------------------------------------------------------------------------	*/
     /**
      * @returns {object} metadata for this extension and its blocks.
      */
@@ -537,8 +522,8 @@ class Scratch3WebMIDI {
 	s_Getmidievent() {
 		// Reset alarm_went_off if it is true, and return true
 		// otherwise, return false.
-		if (mMIDI_event == true) {
-			mMIDI_event = false;
+		if (this.mMIDI_event == true) {
+			this.mMIDI_event = false;
 			return true;
        }
        return false;
@@ -546,20 +531,20 @@ class Scratch3WebMIDI {
 
 //Set Note Number
 	s_Note() {
-		return (mNoteNum);
+		return (this.mNoteNum);
 	}
 
 //Set Note Vel
 	s_Vel() {
-		return (mNoteVel);
+		return (this.mNoteVel);
 	}
 
 // GET KEY ON
 	s_Getkeyon() {
 		// Reset alarm_went_off if it is true, and return true
 		// otherwise, return false.
-		if (mKey_on_event == true) {
-			mKey_on_event = false;
+		if (this.mKey_on_event == true) {
+			this.mKey_on_event = false;
 			return true;
        }
        return false;
@@ -569,8 +554,8 @@ class Scratch3WebMIDI {
 	s_Getkeyonnum(args) {
 		// Reset alarm_went_off if it is true, and return true
 		// otherwise, return false.
-		if (mNoteOn[args.ckeynum] == true) {
-			mNoteOn[args.ckeynum] = false;
+		if (this.mNoteOn[args.ckeynum] == true) {
+			this.mNoteOn[args.ckeynum] = false;
 			return true;
        }
        return false;
@@ -580,8 +565,8 @@ class Scratch3WebMIDI {
 	s_Getkeyoff() {
 		// Reset alarm_went_off if it is true, and return true
 		// otherwise, return false.
-		if (mKey_off_event == true) {
-			mKey_off_event = false;
+		if (this.mKey_off_event == true) {
+			this.mKey_off_event = false;
 			return true;
        }
        return false;
@@ -592,8 +577,8 @@ class Scratch3WebMIDI {
 	s_Getcc() {
 		// Reset alarm_went_off if it is true, and return true
 		// otherwise, return false.
-		if (mCC_change_event === true) {
-			mCC_change_event = false;
+		if (this.mCC_change_event === true) {
+			this.mCC_change_event = false;
 			return true;
        }
        return false;
@@ -603,7 +588,7 @@ class Scratch3WebMIDI {
 // Set CC Value
 // ccnum: Control Change Number
 	s_Ccin(args) {
-		return (mCtlbuf[args.ccnum]);
+		return (this.mCtlbuf[args.ccnum]);
 	}
 
 /* -------------------------------------------------------------------------	*/
@@ -611,8 +596,8 @@ class Scratch3WebMIDI {
 	s_PBevent() {
 		// Reset alarm_went_off if it is true, and return true
 		// otherwise, return false.
-		if (mPBend_event == true) {
-			mPBend_event = false;
+		if (this.mPBend_event == true) {
+			this.mPBend_event = false;
 			return true;
        }
        return false;
@@ -620,7 +605,7 @@ class Scratch3WebMIDI {
 
 //Set PitchBend Valuel
 	s_PBend() {
-		return (mPBend);
+		return (this.mPBend);
 	}
 
 /* -------------------------------------------------------------------------	*/
@@ -628,8 +613,8 @@ class Scratch3WebMIDI {
 	s_PCevent() {
 		// Reset alarm_went_off if it is true, and return true
 		// otherwise, return false.
-		if (mPC_event == true) {
-			mPC_event = false;
+		if (this.mPC_event == true) {
+			this.mPC_event = false;
 			return true;
        }
        return false;
@@ -637,7 +622,7 @@ class Scratch3WebMIDI {
 
 //Set Program Change
 	s_PChange() {
-		return (mPCn);
+		return (this.mPCn);
 	}
 
 /* -------------------------------------------------------------------------	*/
@@ -650,43 +635,43 @@ class Scratch3WebMIDI {
 			{
 				if (mKey_on_flag == true) {
 					n_flag = true;
-					mKey_on_flag =false;
+					this.mKey_on_flag =false;
        			}
 			}
 			break;
 
 			case EventList.KEY_OF:
 			{
-				if (mKey_off_flag == true) {
+				if (this.mKey_off_flag == true) {
 					n_flag = true;
-					mKey_off_flag =false;
+					this.mKey_off_flag =false;
        			}
 			}
 			break;
 
 			case EventList.CC_CHG:
 			{
-				if (mCC_change_flag == true) {
+				if (this.mCC_change_flag == true) {
 					n_flag = true;
-					mCC_change_flag =false;
+					this.mCC_change_flag =false;
        			}
 			}
 			break;
 
 			case EventList.P_BEND:
 			{
-				if (mPBend_flag == true) {
+				if (this.mPBend_flag == true) {
 					n_flag = true;
-					mPBend_flag =false;
+					this.mPBend_flag =false;
        			}
 			}
 			break;
 
 			case EventList.PG_CHG:
 			{
-				if (mPC_flag == true) {
+				if (this.mPC_flag == true) {
 					n_flag = true;
-					mPC_flag =false;
+					this.mPC_flag =false;
        			}
 			}
 			break;
@@ -698,13 +683,13 @@ class Scratch3WebMIDI {
 //NOTE ON
 	s_Noteon_out(args){
 		var chnum = (args.channelnum&0x0F)-1;
-		return m_midiout(0x90+chnum,args.notenum&0x7F,args.velo&0x7F);
+		return this._m_midiout(0x90+chnum,args.notenum&0x7F,args.velo&0x7F);
 	}
 
 //NOTE OFF
 	s_Noteoff_out(args){
 		var chnum = (args.channelnum&0x0F)-1;
-		return m_midiout(0x80+chnum,args.notenum&0x7F,args.velo&0x7F);
+		return this._m_midiout(0x80+chnum,args.notenum&0x7F,args.velo&0x7F);
 	}
 
 
@@ -721,37 +706,19 @@ var mTimer = setInterval(function(){
 	s_GetBeat(args) {
 		// Reset alarm_went_off if it is true, and return true
 		// otherwise, return false.
-		mTempo = args.tempo;
+		this.mTempo = args.tempo;
 
-		if (mBeat >= mResolution) {
-			mBeat = mBeat-mResolution;
+		if (this.mBeat >= this.mResolution) {
+			this.mBeat = this.mBeat-this.mResolution;
 			return true;
        }
        return false;
 	}
 
 	s_Ticks(){
-		return (Math.floor(mCount));
+		return (Math.floor(this.mCount));
 	}
 
-	s_RestTicks(args){
-		args.rticks = args.rticks%480;
-		var irticks = args.rticks;
-		var iCount = mCount;
-
-		var itimer = setInterval(function(){
-			var dcount = mCount-iCount;
-			if ( dcount<0 ) dcount =dcount + mResolution*4;
-			if( dcount >= irticks){
-//				console.log(irticks,dcount);
-				clearInterval(itimer);
-				return true;
-			}
-	       return false;
-
-		} , mBaseCount);
-
-	}
     /**
      * Rest for some number of beats.
      * @param {object} args - the block arguments.
@@ -761,12 +728,10 @@ var mTimer = setInterval(function(){
 	s_RestTicks(args, util) {
 		var iCount = this.mCount;
 
-		if (this._stackTimerNeedsInit(util)) {
+        if (this._stackTimerNeedsInit(util)) {
             let irticks = args.rticks;
-			var waittime = irticks/mResolution * 60/mTempo;
-   //         beats = this._clampBeats(beats);
-   //         this._startStackTimer(util, this._beatsToSec(beats));
-			this._startStackTimer(util, waittime);
+            beats = this._clampBeats(beats);
+            this._startStackTimer(util, this._beatsToSec(beats));
         } else {
             this._checkStackTimer(util);
         }
@@ -808,6 +773,5 @@ var mTimer = setInterval(function(){
         }
     }
 
-/* -------------------------------------------------------------------------	*/
 }
 module.exports = Scratch3WebMIDI;
