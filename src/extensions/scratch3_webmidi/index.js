@@ -47,7 +47,7 @@ const menuIconURI = 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHdpZHRoP
 	var mPBend	 = 64;
 	var mPCn	 = 0;
 
-/* -------------------------------------------------------------------------	*/
+/* ================================	*/
 	var mCount	= 0;
 	var mBeat	= 0;
 	var mDticks = 1;
@@ -397,6 +397,34 @@ class Scratch3WebMIDI {
 				},
 
 				{
+					opcode: 's_Noteon_out_duration',
+					text: formatMessage({
+						id: 'webmidi.noteon_out_durauion',
+						default: 'NOTE ON [channelnum][notenum][velo][duration]',
+						description: 'send note on with duration'
+					}),
+					blockType: BlockType.COMMAND,
+					arguments: {
+						channelnum: {
+							type: ArgumentType.NUMBER,
+							defaultValue: 1
+						},
+						notenum: {
+							type: ArgumentType.NUMBER,
+							defaultValue: 60
+						},
+						velo: {
+							type: ArgumentType.NUMBER,
+							defaultValue: 127
+						},
+						duration: {
+							type: ArgumentType.NUMBER,
+							defaultValue: 480
+						}
+					}
+				},
+
+				{
 					opcode: 's_Noteoff_out',
 					text: formatMessage({
 						id: 'webmidi.noteoff_out',
@@ -462,8 +490,9 @@ class Scratch3WebMIDI {
 		};
 	}
 
+/* ================================	*/
    /**
-     * Initialize color parameters menu with localized strings
+     * Initialize event parameters menu with localized strings
      * @returns {array} of the localized text and values for each menu element
      * @private
      */
@@ -514,6 +543,7 @@ class Scratch3WebMIDI {
         ];
     }
 
+/* ================================	*/
 	/**
 		* Write log.
 		* @param {object} args - the block arguments.
@@ -532,7 +562,7 @@ class Scratch3WebMIDI {
 		return navigator.userAgent;
 	}
 
-/* -------------------------------------------------------------------------	*/
+/* ================================	*/
 // GET NOTE ON/OFF
 	s_Getmidievent() {
 		// Reset alarm_went_off if it is true, and return true
@@ -587,7 +617,7 @@ class Scratch3WebMIDI {
        return false;
 	}
 
-/* -------------------------------------------------------------------------	*/
+/* ================================	*/
 // GET CC
 	s_Getcc() {
 		// Reset alarm_went_off if it is true, and return true
@@ -606,7 +636,7 @@ class Scratch3WebMIDI {
 		return (mCtlbuf[args.ccnum]);
 	}
 
-/* -------------------------------------------------------------------------	*/
+/* ================================	*/
 //Set PitchBend
 	s_PBevent() {
 		// Reset alarm_went_off if it is true, and return true
@@ -623,7 +653,7 @@ class Scratch3WebMIDI {
 		return (mPBend);
 	}
 
-/* -------------------------------------------------------------------------	*/
+/* ================================	*/
 //Set Program Change Event
 	s_PCevent() {
 		// Reset alarm_went_off if it is true, and return true
@@ -640,7 +670,7 @@ class Scratch3WebMIDI {
 		return (mPCn);
 	}
 
-/* -------------------------------------------------------------------------	*/
+/* ================================	*/
 //Event
 	s_Event(args) {
 		var n_flag=false;
@@ -694,12 +724,23 @@ class Scratch3WebMIDI {
 		return n_flag;
 	}
 
-/* -------------------------------------------------------------------------	*/
+/* ================================	*/
 //NOTE ON
 	s_Noteon_out(args){
 		var chnum = (args.channelnum&0x0F)-1;
 		return m_midiout(0x90+chnum,args.notenum&0x7F,args.velo&0x7F);
 	}
+
+	s_Noteon_out_duration(args){
+		var chnum = (args.channelnum&0x0F)-1;
+		var irticks=args.duration;
+		if(irticks<10) irticks=10;
+		var waittime = irticks/mResolution * 60/mTempo*1000;
+		setTimeout( function(){m_midiout(0x80+chnum,args.notenum&0x7F,0x40);}
+			,waittime);
+		return m_midiout(0x90+chnum,args.notenum&0x7F,args.velo&0x7F);
+	}
+
 
 //NOTE OFF
 	s_Noteoff_out(args){
@@ -708,7 +749,7 @@ class Scratch3WebMIDI {
 	}
 
 
-/* -------------------------------------------------------------------------	*/
+/* ================================	*/
 /*var mCount = 0;
 var mTimer = setInterval(function(){
 //		clearInterval(id);　//idをclearIntervalで指定している
@@ -734,6 +775,7 @@ var mTimer = setInterval(function(){
 		return (Math.floor(mCount));
 	}
 
+/*
 	s_RestTicks(args){
 		args.rticks = args.rticks%480;
 		var irticks = args.rticks;
@@ -752,6 +794,7 @@ var mTimer = setInterval(function(){
 		} , mBaseCount);
 
 	}
+*/
     /**
      * Rest for some number of beats.
      * @param {object} args - the block arguments.
@@ -772,7 +815,7 @@ var mTimer = setInterval(function(){
         }
     }
 
-/* -------------------------------------------------------------------------	*/
+/* ================================	*/
     /**
      * Check if the stack timer needs initialization.
      * @param {object} util - utility object provided by the runtime.
@@ -808,6 +851,6 @@ var mTimer = setInterval(function(){
         }
     }
 
-/* -------------------------------------------------------------------------	*/
+/* ================================	*/
 }
 module.exports = Scratch3WebMIDI;
