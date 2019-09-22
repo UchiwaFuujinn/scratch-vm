@@ -24,7 +24,8 @@ const builtinExtensions = {
     ev3: () => require('../extensions/scratch3_ev3'),
     makeymakey: () => require('../extensions/scratch3_makeymakey'),
     gdxfor: () => require('../extensions/scratch3_gdx_for'),
-    webmidi: () => require('../extensions/scratch3_webmidi')
+    webmidi: () => require('../extensions/scratch3_webmidi'),
+    gamepad: () => require('../extensions/scratch3_gamepad')
 };
 
 /**
