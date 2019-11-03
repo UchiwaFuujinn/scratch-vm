@@ -20,6 +20,7 @@ const blockIconURI = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYA
 // eslint-disable-next-line max-len
 const menuIconURI = 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDQwIDQwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48ZyBpZD0iSUQwLjA4NjgyNDQzOTAwMDMzODMyIiB0cmFuc2Zvcm09Im1hdHJpeCgwLjQ5MTU0NjY2MDY2MTY5NzQsIDAsIDAsIDAuNDkxNTQ2NjYwNjYxNjk3NCwgLTY0LjUsIC03Ny4yNSkiPjxwYXRoIGlkPSJJRDAuNTcyMTQ2MjMwMzc3MjU2OSIgZmlsbD0iI0ZGOTQwMCIgc3Ryb2tlPSJub25lIiBkPSJNIDE4OCAxNDEgTCAyNTAgMTQxIEwgMjUwIDIwMyBMIDE4OCAyMDMgTCAxODggMTQxIFogIiB0cmFuc2Zvcm09Im1hdHJpeCgxLjI4NzkwMzMwODg2ODQwODIsIDAsIDAsIDEuMjg3OTAzMzA4ODY4NDA4MiwgLTExMC45LCAtMjQuNCkiLz48cGF0aCBpZD0iSUQwLjYzODMzNjEzNTA3NDQ5NjMiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0ZGRkZGRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGQ9Ik0gMTk2IDIwNCBDIDE5NiAyMDQgMTkyLjcwNiAxOTAuMDU4IDE5MyAxODMgQyAxOTMuMDc0IDE4MS4yMzYgMTk1Ljg4NiAxNzguNDU4IDE5NyAxODAgQyAyMDEuNDU1IDE4Ni4xNjggMjAzLjQ0MyAyMDMuNzU0IDIwNiAyMDEgQyAyMDkuMjExIDE5Ny41NDIgMjEwIDE2NiAyMTAgMTY2ICIgdHJhbnNmb3JtPSJtYXRyaXgoMSwgMCwgMCwgMSwgLTU3LCAxNS44KSIvPjxwYXRoIGlkPSJJRDAuNzU4NzMwMzU2NTgxNTA5MSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRkZGRkZGIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgZD0iTSAyMTUgMTY5IEMgMjE1IDE2OSAyMTguMzY3IDE2OS41MzQgMjIwIDE3MCBDIDIyMC43MTYgMTcwLjIwNSAyMjEuMjc4IDE3MC44MTkgMjIyIDE3MSBDIDIyMi42NDYgMTcxLjE2MiAyMjMuMzY4IDE3MC43ODkgMjI0IDE3MSBDIDIyNC40NDcgMTcxLjE0OSAyMjUgMTcyIDIyNSAxNzIgIiB0cmFuc2Zvcm09Im1hdHJpeCgxLCAwLCAwLCAxLCAtNTcsIDE1LjgpIi8+PHBhdGggaWQ9IklEMC4yNDM2NzMwNzMxMjc4NjU4IiBmaWxsPSJub25lIiBzdHJva2U9IiNGRkZGRkYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBkPSJNIDIyNyAxNTQgQyAyMjcgMTU0IDIxOC41NTUgMTQ3Ljg5MCAyMTcgMTUxIEMgMjEyLjM0NSAxNjAuMzEwIDIxMS4yODkgMTcxLjczMyAyMTMgMTgyIEMgMjEzLjYxMiAxODUuNjcyIDIyMyAxODcgMjIzIDE4NyAiIHRyYW5zZm9ybT0ibWF0cml4KDEsIDAsIDAsIDEsIC01NywgMTUuOCkiLz48cGF0aCBpZD0iSUQwLjc5MzkzOTQ4MTk1NTAyMTYiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0ZGRkZGRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIGQ9Ik0gMTc1IDIwMC41MDAgQyAxNzUgMjAwLjUwMCAxNjkuODA1IDIyMS45MTMgMTcxIDIyMi43NTAgQyAxNzIuMTk1IDIyMy41ODcgMTc4Ljc5NSAyMDUuMjk1IDE4Mi41MDAgMjA1Ljc1MCBDIDE4NS45MjAgMjA2LjE3MCAxODEuODU5IDIyNC41MDAgMTg1LjI1MCAyMjQuNTAwIEMgMTg5LjIxMyAyMjQuNTAwIDE5Ny4yNTAgMjA1Ljc1MCAxOTcuMjUwIDIwNS43NTAgIi8+PC9nPjwvc3ZnPg==';
 
+/* ----------------------------------------	*/
 	/* for MIDI Ebvent */
 	var mMIDI= null;
 	var mInputs	=null;
@@ -172,7 +173,6 @@ function m_noteon(note, vel)
 	}
 }
 
-
 function m_midiout(event, note, vel){
 	var data1=event&0xFF;
 	var data2=note&0x7F;
@@ -183,6 +183,21 @@ function m_midiout(event, note, vel){
 			var l_output=mOutputs[i];
 			if(l_output!=null){
 				l_output.send([data1,data2,data3], 0);
+			}
+		}
+	}
+}
+
+function m_sysexout(data,size){
+	var buf=new Array(size);
+	for(var i=0; i<size; i++){
+		buf[i]=data[i];
+	}
+	if(mOutputs!=null){
+		for(var i=0; i<mOutputs.length; i++){
+			var l_output=mOutputs[i];
+			if(l_output!=null){
+				l_output.send(buf, 0);
 			}
 		}
 	}
@@ -202,7 +217,7 @@ class Scratch3WebMIDI {
          */
         this.runtime = runtime;
 
-		navigator.requestMIDIAccess().then( success, failure );
+		navigator.requestMIDIAccess({sysex: true }).then( success, failure );
 
         //this._onTargetCreated = this._onTargetCreated.bind(this);
         //this.runtime.on('targetWasCreated', this._onTargetCreated);
@@ -479,6 +494,25 @@ class Scratch3WebMIDI {
 						}
 					}
 				},
+
+/* ================================	*/
+				{
+					opcode: 's_PokeText',
+					text: formatMessage({
+						id: 'webmidi.s_poketext',
+						default: 'Pokemiku [rtext]',
+						description: 'send text to Pokemiku'
+					}),
+					blockType: BlockType.COMMAND,
+					arguments: {
+						rtext: {
+							type: ArgumentType.STRING,
+							defaultValue: 'あいうえお'
+						},
+					}
+				},
+
+/* ================================	*/
 
 			],
             menus: {
@@ -775,6 +809,15 @@ var mTimer = setInterval(function(){
 		return (Math.floor(mCount));
 	}
 
+	s_PokeText(args){
+		if(args.rtext.length<=32){
+	//		console.log(args.rtext);
+		mSize=sendstring(args.rtext);
+		mSysSz=set_sysex();
+		m_sysexout(mMKsys,mSysSz);
+		}
+	}
+
 /*
 	s_RestTicks(args){
 		args.rticks = args.rticks%480;
@@ -853,4 +896,132 @@ var mTimer = setInterval(function(){
 
 /* ================================	*/
 }
+
 module.exports = Scratch3WebMIDI;
+
+
+/* ================================	*/
+const textMapANum=73;
+const textMapBNum=72;
+
+var textMapA=[	//textMapANum
+	["あ", "a"],   ["い", "i"],    ["う", "M"],     ["え", "e"],   ["お", "o"],
+	["か", "k a"], ["き", "k' i"], ["く", "k M"],   ["け", "k e"], ["こ", "k o"],
+	["さ", "s a"], ["し", "S i"],  ["す", "s M"],   ["せ", "s e"], ["そ", "s o"],
+	["た", "t a"], ["ち", "tS i"], ["つ", "ts M"],  ["て", "t e"], ["と", "t o"],
+	["な", "n a"], ["に", "J i"],  ["ぬ", "n M"],   ["ね", "n e"], ["の", "n o"],
+	["は", "h a"], ["ひ", "C i"],  ["ふ", "p\\ M"], ["へ", "h e"], ["ほ", "h o"],
+	["ま", "m a"], ["み", "m i"],  ["む", "m M"],   ["め", "m e"], ["も", "m o"],
+	["ら", "4 a"], ["り", "4' i"], ["る", "4 M"],   ["れ", "4 e"], ["ろ", "4 o"],           
+	["が", "g a"], ["ぎ", "g' i"], ["ぐ", "g M"],   ["げ", "g e"], ["ご", "g o"],
+	["ざ", "dz a"],["じ", "dZ i"], ["ず", "dz M"],  ["ぜ", "dZ e"],["ぞ", "dz o"],
+	["だ", "d a"], ["ぢ", "dZ i"], ["づ", "dz M"],  ["で", "d e"], ["ど", "d o"],
+	["ば", "b a"], ["び", "b' i"], ["ぶ", "b M"],   ["べ", "b e"], ["ぼ", "b o"],
+	["ぱ", "p a"], ["ぴ", "p' i"], ["ぷ", "p M"],   ["ぺ", "p e"], ["ぽ", "p o"],
+	["や", "j a"], ["ゆ", "j M"],  ["よ", "j o"],
+	["わ", "w a"], ["ゐ", "w i"],  ["ゑ", "w e"],   ["を", "o"],   ["ん", "N\\"]
+];
+
+var textMapB =[ //textMapBNum
+	["ふぁ", "p\\ a"],["つぁ", "ts a"],
+	["うぃ", "w i"],  ["すぃ", "s i"],  ["ずぃ", "dz i"], ["つぃ", "ts i"], ["てぃ", "t' i"],
+	["でぃ", "d' i"], ["ふぃ", "p\\' i"],
+	["とぅ", "t M"],  ["どぅ", "d M"],
+	["いぇ", "j e"],  ["うぇ", "w e"],  ["きぇ", "k' e"], ["しぇ", "S e"],  ["ちぇ", "tS e"],
+	["つぇ", "ts e"], ["てぇ", "t' e"], ["にぇ", "J e"],  ["ひぇ", "C e"],  ["みぇ", "m' e"],
+	["りぇ", "4' e"], ["ぎぇ", "g' e"], ["じぇ", "dZ e"], ["でぇ", "d' e"], ["びぇ", "b' e"],
+	["ぴぇ", "p' e"], ["ふぇ", "p\\ e"],
+	["うぉ", "w o"],  ["つぉ", "ts o"], ["ふぉ", "p\\ o"],
+	["きゃ", "k' a"], ["しゃ", "S a"],  ["ちゃ", "tS a"], ["てゃ", "t' a"], ["にゃ", "J a"],
+	["ひゃ", "C a"],  ["みゃ", "m' a"], ["りゃ", "4' a"], ["ぎゃ", "N' a"], ["じゃ", "dZ a"],
+	["でゃ", "d' a"], ["びゃ", "b' a"], ["ぴゃ", "p' a"], ["ふゃ", "p\\' a"],
+	["きゅ", "k' M"], ["しゅ", "S M"],  ["ちゅ", "tS M"], ["てゅ", "t' M"], ["にゅ", "J M"],
+	["ひゅ", "C M"],  ["みゅ", "m' M"], ["りゅ", "4' M"], ["ぎゅ", "g' M"], ["じゅ", "dZ M"],
+	["でゅ", "d' M"], ["びゅ", "b' M"], ["ぴゅ", "p' M"], ["ふゅ", "p\\' M"],
+	["きょ", "k' o"], ["しょ", "S o"],  ["ちょ", "tS o"], ["てょ", "t' o"], ["にょ", "J o"],
+	["ひょ", "C o"],  ["みょ", "m' o"], ["りょ", "4' o"], ["ぎょ", "N' o"], ["じょ", "dZ o"],
+	["でょ", "d' o"], ["びょ", "b' o"], ["ぴょ", "p' o"]
+];
+
+var mDex;
+var mTextMap=null;
+var mMKsys=null;
+var mSize=null;
+var mSysSz=null;
+const mSYSMAX=1024;
+
+function init_textanlz()
+{
+	mTextMap=new Array(textMapANum+textMapBNum);
+	for(var i=0; i<textMapANum; i++){
+		mTextMap[textMapA[i][0]]=textMapA[i][1];
+	}
+	for(var i=0; i<textMapBNum; i++){
+		mTextMap[textMapB[i][0]]=textMapB[i][1];
+	}
+	mMKsys=new Array(mSYSMAX);
+	mMKsys[0]=0xF0; mMKsys[1]=0x43; mMKsys[2]=0x79; mMKsys[3]=0x09;
+	mMKsys[4]=0x00; mMKsys[5]=0x50; mMKsys[6]=0x10;
+}
+
+function sendstring(text)
+{
+	var i, j=text.length, k=0;
+	var str=null;
+	var ss=null;
+	mDex= new Array(j);
+
+	for(i=0; i<j-1; i++){
+		str=text[i]+text[i+1];
+		if((ss=mTextMap[str])!=null){
+			mDex[k++] = ss;
+			i++;
+		}
+		else {
+			if((ss=mTextMap[text[i]])!=null){
+				mDex[k++] = ss;
+			}
+		}
+	}
+	if(i<j){
+		if((ss=mTextMap[text[i]])!=null){
+			mDex[k++] = ss;
+		}
+	}
+	return k;
+}
+
+function set_sysex()
+{
+	var i,j;
+	var k=7;
+	for(i=0; i<mSize; i++){
+		for(j=0; j<mDex[i].length; j++){
+			mMKsys[k++]=mDex[i].charCodeAt(j);
+		}
+		if(i<mSize-1) mMKsys[k++]=0x2c;
+	}
+	mMKsys[k++]=0x00;
+	mMKsys[k++]=0xF7;
+	return k;
+}
+
+init_textanlz();
+
+/*
+mSize=sendstring("あひゃいうvえお ぎょ");
+	console.log(mSize);
+	console.log(mDex);
+mSysSz=set_sysex();
+	console.log(mSysSz);
+	console.log(mMKsys);
+
+mSize=sendstring("かきくけこ");
+	console.log(mSize);
+	console.log(mDex);
+mSysSz=set_sysex();
+	console.log(mSysSz);
+	console.log(mMKsys);
+*/
+
+
