@@ -189,6 +189,21 @@ function m_midiout(event, note, vel){
 	}
 }
 
+
+function m_midiout_2byte(event, data){
+	var data1=event&0xFF;
+	var data2=data&0x7F;
+
+	if(mOutputs!=null){
+		for(var i=0; i<mOutputs.length; i++){
+			var l_output=mOutputs[i];
+			if(l_output!=null){
+				l_output.send([data1,data2], 0);
+			}
+		}
+	}
+}
+
 function m_sysexout(data,size){
 	var buf=new Array(size);
 	for(var i=0; i<size; i++){
@@ -460,6 +475,26 @@ class Scratch3WebMIDI {
 						velo: {
 							type: ArgumentType.NUMBER,
 							defaultValue: 127
+						}
+					}
+				},
+
+				{
+					opcode: 's_ProgramChange',
+					text: formatMessage({
+						id: 'webmidi.program_change',
+						default: 'PrgChg [channelnum][pnumber]',
+						description: 'send program change'
+					}),
+					blockType: BlockType.COMMAND,
+					arguments: {
+						channelnum: {
+							type: ArgumentType.NUMBER,
+							defaultValue: 1
+						},
+						pnumber: {
+							type: ArgumentType.NUMBER,
+							defaultValue: 1
 						}
 					}
 				},
@@ -788,6 +823,12 @@ class Scratch3WebMIDI {
 		return m_midiout(0x80+chnum,args.notenum&0x7F,args.velo&0x7F);
 	}
 
+//Program Change
+	s_ProgramChange(args){
+		var chnum = (args.channelnum&0x0F)-1;
+		var pgnum = (args.pnumber&0x7F);
+		return m_midiout_2byte(0xC0+chnum,pgnum);
+	}
 
 /* ================================	*/
 /*var mCount = 0;
