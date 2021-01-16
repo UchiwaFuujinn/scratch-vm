@@ -27,6 +27,8 @@ const menuIconURI = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAA
 	var mInputs	=null;
 	var mOutputs=null;
 
+	var mOutDev=0;	//Output Device Number
+
 	var mCtlbuf = new Array(0x80);
 	var mNoteOn = new Array(0x80);
 
@@ -45,7 +47,7 @@ const menuIconURI = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAA
 
 	var mNoteNum = 0;
 	var mNoteVel = 0;
-	var mNoteBuf = 0;
+//	var mNoteBuf = 0;
 	var mPBend	 = 64;
 	var mPCn	 = 0;
 
@@ -89,6 +91,8 @@ const EventList = {
 function success(midiAccess)
 	{
 		mMIDI=midiAccess;
+		var msg="Success MIDI!\n";
+		var inum=0, onum=0;
 
 		for(var i=0; i<0x80; i++){
 			mCtlbuf[i]=0;
@@ -99,21 +103,46 @@ function success(midiAccess)
 			mInputs  =	mMIDI.inputs();
 			mOutputs =	mMIDI.outputs();
 		} else {
+			msg+="input Device "
 			var inputIterator = mMIDI.inputs.values();
 			mInputs = [];
 			for (var o = inputIterator.next(); !o.done; o = inputIterator.next()) {
-				mInputs.push(o.value)
+				mInputs.push(o.value);
+				msg+=(inum+1).toString(10);
+				msg+=":";
+				msg+=o.value.name;
+				msg+=" ";
+				inum++;
 			}
+			if(inum==0){
+				msg+="Zero\n";
+			} else {
+				msg+="\n";
+			}
+
+			msg+="Output Device "
 			var outputIterator = mMIDI.outputs.values();
 			mOutputs = [];
 			for (var o = outputIterator.next(); !o.done; o = outputIterator.next()) {
 				mOutputs.push(o.value)
+				msg+=(onum+1).toString(10);
+				msg+=":";
+				msg+=o.value.name;
+				msg+=" ";
+				onum++;
+			}
+			if(onum==0){
+				msg+="Zero\n";
+			} else {
+				msg+="\n";
 			}
 		}
 		for(var i=0; i<mInputs.length;i++){
 			mInputs[i].onmidimessage=m_midiin;
 		}
-		alert( "Success MIDI!" );
+//		alert( "Success MIDI!\n", msg );
+		alert( msg );
+		console.log(msg);
 	}
 
 function failure(error)
@@ -179,9 +208,18 @@ function m_midiout(event, note, vel){
 	var data2=note&0x7F;
 	var data3=vel&0x7F;
 
-	if(mOutputs!=null){
+/*	if(mOutputs!=null){
 		for(var i=0; i<mOutputs.length; i++){
 			var l_output=mOutputs[i];
+			if(l_output!=null){
+				l_output.send([data1,data2,data3], 0);
+			}
+		}
+	}
+*/
+	if(mOutputs!=null){
+		if(mOutDev<mOutputs.length){
+			var l_output=mOutputs[mOutDev];
 			if(l_output!=null){
 				l_output.send([data1,data2,data3], 0);
 			}
@@ -194,9 +232,18 @@ function m_midiout_2byte(event, data){
 	var data1=event&0xFF;
 	var data2=data&0x7F;
 
-	if(mOutputs!=null){
+/*	if(mOutputs!=null){
 		for(var i=0; i<mOutputs.length; i++){
 			var l_output=mOutputs[i];
+			if(l_output!=null){
+				l_output.send([data1,data2], 0);
+			}
+		}
+	}
+*/
+	if(mOutputs!=null){
+		if(mOutDev<mOutputs.length){
+			var l_output=mOutputs[mOutDev];
 			if(l_output!=null){
 				l_output.send([data1,data2], 0);
 			}
@@ -210,8 +257,15 @@ function m_sysexout(data,size){
 		buf[i]=data[i];
 	}
 	if(mOutputs!=null){
-		for(var i=0; i<mOutputs.length; i++){
+/*		for(var i=0; i<mOutputs.length; i++){
 			var l_output=mOutputs[i];
+			if(l_output!=null){
+				l_output.send(buf, 0);
+			}
+		}
+*/
+		if(mOutDev<mOutputs.length){
+			var l_output=mOutputs[mOutDev];
 			if(l_output!=null){
 				l_output.send(buf, 0);
 			}
@@ -238,7 +292,7 @@ class Scratch3WebMIDI {
         //this._onTargetCreated = this._onTargetCreated.bind(this);
         //this.runtime.on('targetWasCreated', this._onTargetCreated);
     }
-
+/*
 	success(midiAccess)
 	{
 		this.m=midiAccess;
@@ -250,7 +304,7 @@ class Scratch3WebMIDI {
 			var inputIterator = this.m.inputs.values();
 			this.mInputs = [];
 			for (var o = inputIterator.next(); !o.done; o = inputIterator.next()) {
-				this.mInputs.push(o.value)
+				this.mInputs.push(o.value);
 			}
 
 			var outputIterator = this.m.outputs.values();
@@ -269,6 +323,7 @@ class Scratch3WebMIDI {
 	{
 		alert( "Failed MIDI!" + error );
 	}
+*/
 
     /**
      * @returns {object} metadata for this extension and its blocks.
@@ -530,6 +585,23 @@ class Scratch3WebMIDI {
 						}
 					}
 				},
+
+				{
+					opcode: 's_OutDevice',
+					text: formatMessage({
+						id: 'webmidi.out_device',
+						default: 'Out Dev No. [outdev]',
+						description: 'midi out device number'
+					}),
+					blockType: BlockType.COMMAND,
+					arguments: {
+						outdev: {
+							type: ArgumentType.NUMBER,
+							defaultValue: 1
+						},
+					}
+				},
+
 
 /* ================================	*/
 				{
@@ -830,12 +902,18 @@ class Scratch3WebMIDI {
 		return m_midiout_2byte(0xC0+chnum,pgnum);
 	}
 
+//MIDI Output Device Number
+	s_OutDevice(args){
+		if(args.outdev<1) args.outdev=1;
+		else if(args.outdev>mOutputs.length) args.outdev=mOutputs.length;
+		mOutDev=args.outdev-1;
+	}
+
 /* ================================	*/
 /*var mCount = 0;
 var mTimer = setInterval(function(){
 //		clearInterval(id);　//idをclearIntervalで指定している
 		mCount++;
-	}
 	}, 20);
 */
 
@@ -946,7 +1024,7 @@ var mTimer = setInterval(function(){
     }
 
 /* ================================	*/
-}
+} //--- class Scratch3WebMIDI
 
 module.exports = Scratch3WebMIDI;
 
